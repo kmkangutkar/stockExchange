@@ -1,33 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct {
-	char *handlInst;
-	char *client_orderID;
-	char *symbol;
-	char *side;
-	char *type;
-	double price;
-	double quantity;
-} new_obj; 
-
-typedef struct {
-	char *client_orderID;
-	char *symbol;
-	char *side;
-	double quantity;
-} can_obj;
-
-typedef struct {
-	char *handlInst;
-	char *client_orderID;
-	char *original_orderID;
-	char *symbol;
-	char *side;
-	char *type;
-	double price;
-	double quantity;
-} rep_obj;
 
 new_obj func_n(new_obj obj) {
 	printf("%s\n", obj.handlInst);

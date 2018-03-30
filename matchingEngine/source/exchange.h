@@ -2,13 +2,30 @@
 #include<mysql/mysql.h>
 #include<bits/stdc++.h>
 
+typedef struct {
+	char *handlInst, *client_orderID, *symbol, *side, *type;
+	double price, quantity;
+} new_obj; 
+
+typedef struct {
+	char *client_orderID, *symbol, *side;
+	double quantity;
+} can_obj;
+
+typedef struct {
+	char *handlInst, *client_orderID, *original_orderID;
+	char *symbol, *side, *type;
+	double price, quantity;
+} rep_obj;
+
 struct orders {
-	int order_id, timestamp, quantity, price;  
-	char company;
-	orders(int order_id = 0, int timestamp = 0, int quantity = 0, int price = 0, char company = 0): 
-		order_id(order_id), timestamp(timestamp), quantity(quantity), price(price), company(company) {};	
+	long long timestamp;
+	char *handlInst, *client_orderID, *original_orderID;
+	char *symbol, *side, *type;
+	double price, quantity;
 	void print() const { 
-		printf("order id = %d, timestamp = %d, quantity = %d, price = %d, company = %c\n", order_id, timestamp, quantity, price, company); 
+//		printf("order id = %d, timestamp = %d, quantity = %d, price = %d, company = %c\n", order_id, timestamp, quantity, price, company); 
+		return;
 	}
 };
 
@@ -29,7 +46,7 @@ class compareBuy {
 				return x.timestamp < y.timestamp;
 			else 
 				return x.price < y.price; 
-		} 
+		}
 };
 
 typedef std::multiset<orders, compareBuy>  buyBook;
