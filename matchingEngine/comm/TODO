@@ -1,9 +1,0 @@
-add QuickFIX log
-    add timestamp of when I received the order
-    call action_handler
-    update log when I receive acknowledgement from action_handler
-
-add field for expiry of order
-
-Upcoming work:
-    real time market data request

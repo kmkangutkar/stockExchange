@@ -2,7 +2,7 @@ from __future__ import print_function
 import quickfix as fix
 import time
 import quickfix44 as fix44
-from wrapper import call_action_handler
+import libs.engine as engine
 
 class Executor(fix.Application):
     orderID = 0
@@ -77,7 +77,24 @@ class Executor(fix.Application):
     def get_field_value(self, message, key):
         message.getField(key)
         return key.getValue()
+    
+    def call_action_handler(self, request_type, message):
+        if(request_type == "new"): 
+            obj = engine.orders(int(time.time()), message['handlInst'], message['client_orderID'], message['client_orderID'], 
+                message['symbol'], message['side'], message['type'], message['price'], message['quantity'])
+            engine.new_order(obj) 
+        elif(request_type == "replace"): 
+            obj = engine.orders(int(time.time()), message['handlInst'], message['client_orderID'], message['original_orderID'], 
+                message['symbol'], message['side'], message['type'], message['price'], message['quantity'])
+            engine.replace_order(obj) 
 
+        elif(request_type == "cancel"): 
+            obj = engine.orders(int(time.time()), 'handlInst', message['client_orderID'], message['client_orderID'], 
+                message['symbol'], message['side'], 'delete', 0.00, message['quantity'])
+            engine.cancel_order(obj) 
+        
+        return True
+    
     def request_to_action_handler(self, request_type, message):
         """Send a request to action handler and receive the acknowledgement."""
         print('Request type:', request_type)
@@ -92,8 +109,7 @@ class Executor(fix.Application):
         # exit()
         orderID = self.gen_orderID()
         self.orders[orderID] = message_details
-        is_success = call_action_handler(request_type, message_details)
-      # is_success = True
+        is_success = self.call_action_handler(request_type, message_details)
         return is_success, orderID, message_details
 
     def generate_message_fields(self, message_type):
@@ -347,7 +363,7 @@ class Executor(fix.Application):
 
 def main():
     try:
-        settings = fix.SessionSettings('executor.cfg')
+        settings = fix.SessionSettings('config/executor.cfg')
         application = Executor()
         storeFactory = fix.FileStoreFactory(settings)
         logFactory = fix.FileLogFactory(settings)

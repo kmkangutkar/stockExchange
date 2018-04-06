@@ -9,7 +9,7 @@ if(str.find("Roland McGrath") == -1):
 #Table Creation
 
 db = MySQLdb.connect(host="localhost", user="root",passwd="shashank")
-cursor = db1.cursor()
+cursor = db.cursor()
 sql = 'CREATE DATABASE cs_matching_engine'
 cursor.execute(sql)
 db.close()
@@ -22,7 +22,7 @@ cursor.execute(sql)
 sql = " CREATE TABLE pending_orders ( timestamp BIGINT UNSIGNED NOT NULL, order_id varchar(16) PRIMARY KEY, quantity INT UNSIGNED, order_type VARCHAR(6), price DOUBLE);"
 cursor.execute(sql)
 
-sql = " CREATE TABLE order_details (timestamp BIGINT NOT NULL, order_id varchar(16) PRIMARY KEY, ticker VARCHAR(8) NOT NULL, order_type VARCHAR(8) NOT NULL, price DOUBLE NOT NULL, quantity DOUBLE NOT NULL, status VARCHAR(16) NOT NULL, broker_id VARCHAR(16) NOT NULL, matched_order_id varchar(16));"
+sql = " CREATE TABLE order_details (timestamp BIGINT, handlInst VARCHAR(16), client_orderID varchar(16) PRIMARY KEY, symbol VARCHAR(8), side VARCHAR(8), type VARCHAR(8), price DOUBLE NOT NULL, quantity DOUBLE NOT NULL, status varchar(16));"
 cursor.execute(sql)
 
 db.close()

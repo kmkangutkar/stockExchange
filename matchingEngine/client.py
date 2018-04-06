@@ -12,31 +12,32 @@ class Client(fix.Application):
         print('Client -', func_name, '| sessionID -', sessionID)
 
     def onCreate(self, sessionID):
+        self.sessionID = sessionID
         self.pretty_print('onCreate', sessionID)
 
     def onLogon(self, sessionID): 
-        self.pretty_print('onLogon', sessionID)
         self.sessionID = sessionID
+        self.pretty_print('onLogon', sessionID)
 
     def onLogout(self, sessionID): 
         self.pretty_print('onLogout', sessionID)
-
+    
     def toAdmin(self, message, sessionID):
         self.pretty_print('toAdmin', sessionID)
-        print('Message:\n', message)
+       #print('Message:\n', message)
 
     def toApp(self, message, sessionID): 
         self.pretty_print('toApp', sessionID)
 
     def fromAdmin(self, message, sessionID): 
         self.pretty_print('fromAdmin', sessionID)
-        print('Message:\n', message)
+        #print('Message:\n', message)
 
     def fromApp(self, message, sessionID): 
         self.pretty_print('fromApp', sessionID)
         print('Message:\n', message)
         print('Message type:', self.get_header_value(message, fix.MsgType()))
-
+    
     def get_header_value(self, message, field): 
         key = field
         message.getHeader().getField(key)
@@ -128,7 +129,7 @@ class Client(fix.Application):
 
 def main():
     try:
-        settings = fix.SessionSettings('client.cfg')
+        settings = fix.SessionSettings('config/client.cfg')
         application = Client()
         storeFactory = fix.FileStoreFactory(settings)
         logFactory = fix.FileLogFactory(settings)
