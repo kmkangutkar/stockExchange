@@ -1,12 +1,12 @@
-#include "pybind11/pybind11.h"
 #include <set>
 #include <sys/time.h>
 #include <mysql/mysql.h>
+#include <cstdlib>
 #include <string>
-#include <cstring>
 #include <iterator>
-namespace py = pybind11;
+#include <iostream>
 typedef std::string string;
+#define debug
 
 struct orders {
 	orders(int t = 0, string hI = "", string coID = "", string ooID = "", string sm = "", string sd = "", string ty = "", double p = 0.00, double q = 0.00) : 
@@ -21,7 +21,10 @@ struct orders {
 
 bool new_order(orders), replace_order(orders), delete_order(orders);
 
+#ifndef debug
+#include "pybind11/pybind11.h"
 PYBIND11_MODULE(engine, trans) {
+	namespace py = pybind11;
 	py::class_<orders>(trans, "orders")
 		.def(py::init<int, string, string, string, string, string, string, double, double>())
 		.def("print", &orders::print);
@@ -29,6 +32,7 @@ PYBIND11_MODULE(engine, trans) {
 	trans.def("replace_order", &replace_order);
 	trans.def("delete_order", &delete_order);
 }
+#endif
 
 string fstring(string s) { return "\"" + s + "\""; }
 
@@ -54,57 +58,103 @@ MYSQL* open_DB() {
 
 void close_DB(MYSQL *connect) { mysql_close(connect); }
 
-bool insert_ob(orders) { return 1; }
-bool delete_ob(orders) { return 1; }
-
-bool match_order(orders trade) {
+bool insert_ob(orders trade, string status) {
 	MYSQL *connect;
 	string cmd;
 	connect = open_DB();
-	cmd = command(2, "SELECT client_orderID" , " quantity FROM order_details where symbol = " + fstring(trade.symbol) + " and status = " + fstring("PENDING"))
-	if(trade.side == "1")
-		cmd = cmd + " and side = " + fstring("2") + " and price <= " + std::to_string(trade.price) + " order by price desc, timestamp asc limit 1";
-	else if(trade.side == "2")
-		cmd = cmd + " and side = " + fstring("1") + " and price >= " + std::to_string(trade.price) + " order by price asc, timestamp asc limit 1";
+	cmd = command(11, "INSERT INTO order_details VALUES (" + std::to_string(time(NULL)), std::to_string(time(NULL)), fstring(trade.handlInst), fstring(trade.client_orderID), 
+			fstring(trade.original_orderID), fstring(trade.symbol), fstring(trade.side), fstring(trade.type), std::to_string(trade.price), std::to_string(trade.quantity), 
+			fstring(status) + ")");
+	if(mysql_query(connect, cmd.c_str())) return false;
 	close_DB(connect);
 	return true;
 }
 
-bool new_order(orders trade) {	
-	string cmd;
+bool delete_ob(orders trade) { 
 	MYSQL *connect;
-	if(insert_ob(trade)) {
-		connect = open_DB();
-		cmd = command(9, "INSERT INTO order_details VALUES (" + std::to_string(time(NULL)), fstring(trade.handlInst), fstring(trade.client_orderID), 
-				fstring(trade.symbol), fstring(trade.side), fstring(trade.type), std::to_string(trade.price), std::to_string(trade.quantity), fstring("PENDING") + ")");
-		if(mysql_query(connect, cmd.c_str())) return false;
-		close_DB(connect);
-		return true;
+	string cmd;
+	connect = open_DB();
+	cmd = command(1, "SELECT client_orderID FROM order_details where symbol = " + fstring(trade.symbol) + " and status = " + fstring("PENDING") + 
+			" and client_orderID = " + fstring(trade.client_orderID));
+	if(mysql_query (connect, cmd.c_str())) return false;
+	row = mysql_fetch_row(mysql_use_result(connect));
+	if(row == NULL) return false;
+	cmd = command(2, "UPDATE order_details SET timestamp = " + std::to_string(time(NULL)), 
+			" status = " + fstring("CANCELLED") + " WHERE client_orderID = " + fstring(trade.client_orderID));
+	if(mysql_query (connect, cmd.c_str())) return false;
+
+	close_DB(connect);
+	return true;
+
+}
+
+bool update_status(orders trade, string status) {
+	MYSQL *connect;
+	string cmd;
+	connect = open_DB();
+	cmd = command(1, "UPDATE order_details SET status = " + fstring(status) + " ,updatedON = " + std::to_string(time(NULL)) 
+			+ " WHERE client_orderID = " + fstring(trade.original_orderID) + " AND status = " + fstring("PENDING"));
+	printf("%s\n", cmd.c_str());
+	if(mysql_query(connect, cmd.c_str())) return false;
+	close_DB(connect);
+	return true;
+}
+
+orders get_matchTrade(orders trade) {
+	MYSQL *connect; MYSQL_ROW row;
+	string cmd;
+	connect = open_DB();
+	
+	cmd = command(1, "SELECT * FROM order_details where symbol = " + fstring(trade.symbol) + " and status = " + fstring("PENDING"));
+	if(trade.side == "1") cmd += " and side = " + fstring("2") + " and price <= " + std::to_string(trade.price) + " order by price desc, createdON asc limit 1";
+	else if(trade.side == "2") cmd += " and side = " + fstring("1") + " and price >= " + std::to_string(trade.price) + " order by price asc, createdON asc limit 1";
+	if(mysql_query (connect, cmd.c_str())) return false;
+	row = mysql_fetch_row(mysql_use_result(connect));
+	if(row == NULL) return orders();
+	close_DB(connect);
+	return orders(atoi(row[1]), string(row[2]), string(row[3]), string(row[4]), string(row[5]), string(row[6]), string(row[7]), atof(row[8]), atof(row[9]));
+}
+
+
+bool match_trade(orders trade) {
+	orders mtrade = get_matchTrade(trade);
+	mtrade.print();
+	trade.print();
+	if(mtrade.timestamp == 0)  
+		insert_ob(trade, "PENDING");
+
+	else if(mtrade.quantity == trade.quantity) {
+		insert_ob(trade, "EXECUTED");
+		update_status(mtrade, "EXECUTED");
 	}
-	return false;
+	else if(mtrade.quantity > trade.quantity) {
+		insert_ob(trade, "EXECUTED");
+		update_status(mtrade, "PARTIAL");
+		mtrade.quantity -= trade.quantity;
+		insert_ob(mtrade, "PENDING");
+	}	
+	else if(mtrade.quantity < trade.quantity) {
+		insert_ob(trade, "PARTIAL");
+		trade.quantity -= mtrade.quantity;
+		insert_ob(trade, "PENDING");
+		update_status(trade, "EXECUTED");	
+	}
+	return true;
+}
+
+bool new_order(orders trade) {	
+	match_trade(trade);
+	return true;
+}
+
+bool cancel_order(orders trade) {
+
 }
 
 bool replace_order(orders trade) { 
-	MYSQL *connect;
-	string cmd;
-	if(delete_ob(trade) && insert_ob(trade)) {
-		connect = open_DB();
-		cmd = command(1, "UPDATE order_details set status = " + fstring("REPLACED") +  " where order_id = " + fstring(trade.original_orderID));
-		if(mysql_query(connect, cmd.c_str())) return false;
-		cmd = command(9, "INSERT INTO order_details VALUES (" + std::to_string(time(NULL)), fstring(trade.handlInst), fstring(trade.client_orderID), 
-				fstring(trade.symbol), fstring(trade.side), fstring(trade.type), std::to_string(trade.price), std::to_string(trade.quantity), fstring("PENDING") + ")");
-		if(mysql_query (connect, cmd.c_str())) return false;
+	if(cancel_order(trade)) {
+		new_order(trade);
 		return true;
 	}
 	return false;	
-}
-
-bool delete_order(orders trade) {
-	MYSQL *connect;
-	string cmd;
-	if(!delete_ob(trade)) return false;
-	cmd = command(2, "UPDATE order_details SET timestamp = " + std::to_string(time(NULL)), 
-			" status = " + fstring("CANCELLED") + " WHERE order_id = " + fstring(trade.client_orderID));
-	if(mysql_query (connect, cmd.c_str())) return false;
-	return true;
 }

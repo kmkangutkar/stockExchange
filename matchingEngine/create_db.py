@@ -22,7 +22,7 @@ cursor.execute(sql)
 sql = " CREATE TABLE pending_orders ( timestamp BIGINT UNSIGNED NOT NULL, order_id varchar(16) PRIMARY KEY, quantity INT UNSIGNED, order_type VARCHAR(6), price DOUBLE);"
 cursor.execute(sql)
 
-sql = " CREATE TABLE order_details (timestamp BIGINT, handlInst VARCHAR(16), client_orderID varchar(16) PRIMARY KEY, symbol VARCHAR(8), side VARCHAR(8), type VARCHAR(8), price DOUBLE NOT NULL, quantity DOUBLE NOT NULL, status varchar(16));"
+sql = " CREATE TABLE order_details (createdOn BIGINT, updatedOn BIGINT, handlInst VARCHAR(16), client_orderID varchar(16), original_orderID varchar(16), symbol VARCHAR(8), side VARCHAR(8), type VARCHAR(8), price DOUBLE NOT NULL, quantity DOUBLE NOT NULL, status varchar(16));"
 cursor.execute(sql)
 
 db.close()
