@@ -1,0 +1,26 @@
+Test Descriptions
+-----------------
+
+Test Number: 1
+---------------
+
+Achintya Pataskar
+
+File involved:
+
+1.in -> Is a file containing a list of orders to be executed in the matching engine. The first line of this file contains the number of orders. Each of the next lines contains one order each. This file contains randomly generated data.
+
+The format of each of the orders is as follows:
+
+timestamp	order_id	ticker	order_type	price	quantity	status	broker_id	matched_order_id
+
+Except for ticker, everything is integer. Ticker is of type char, and takes values between 'a' and 'z'.
+
+1.log -> This file stores all trades received by the matching engine. The purpose of the log file is to have a record to recover from if the matching engine fails.
+
+1.match -> This file is intended to be the main output file for this test case. This file contains the trades executed by the engine. Each line corresponds to a trade that was successfully executed. 
+The format of a trade is as follows:
+
+timestamp	trade_id	quantity	buy_order_id	sell_order_id	ticker	price
+
+Running the test: Use the 1.in file as input to your matching engine, and generate a file for trades executed in the formats as specified above. Use diff command to check if 1.match and your list of executed trades is same or not. If they are same the test case is PASS.

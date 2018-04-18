@@ -1,0 +1,26 @@
+Test suite for Matching Engine
+-------------------------------
+
+This suite contains tests for the Matching Engine. The tests here are either C programs, Shell scripts, or pairs of input/output files to be used for testing the matching engine in various scenarios.
+
+This test suit comes with a basic C implementation of the Matching Engine which is intended to be easily understandable and modifiable in nature. This can be used to create additional randomly generated data sets.
+
+The entire test suite is designed to be automated with one shell script. If more test cases are to be added, add them to the check.sh file, and add a test description below.
+
+To run all tests in the test suite run command: ./check.sh
+
+Test Suite Description
+----------------------
+
+This test suite contatins files for testing the Matching Engine. To ease the process of test reporting and creating new tests the tests are numbered. To add tests for new features, increment the greatest test number by 1. To make it easy for users to manage all test files, all the files included in one test must be named in the form <test_number>.<descriptive_file_name>. Example: the input file for test 1 should be named 1.in or log file to be generated in test 1 should be named 1.log. Add a brief description about the test in the table below, and add a detailed description of the test in the file TESTDESCRIPTION. The description below should give the user a brief idea about your test case, and the detatiled description in TESTDESCRIPTION should include instructions for using the test case, purpose of each file, name of test creator, expected results etc.
+
+Test Description
+----------------
+
+0	-	Test environment variable such as compiler, terminal name, etc.
+1	-	Run matching engine against a normal usage session.
+2	-	Run matching engine with log file for full recovery.
+3	-	Fail gracefully and write all orders to log.
+4	-	Run to check for all sell orders. Including sanity checks for all sell orders.
+5	-	Run to check for all buy orders. Including sanity checks for all buy orders.
+6	-	Run to check for all replace orders. Including sanity checks for all replace orders.
