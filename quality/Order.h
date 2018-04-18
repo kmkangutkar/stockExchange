@@ -35,3 +35,4 @@ void Order_setSource(int state);
 Order Order_newOrder();
 void Order_print(Order *o);
 void Order_printVerbose(Order *o);
+int Order_sanityCheck(Order *o);

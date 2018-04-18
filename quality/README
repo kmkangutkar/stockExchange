@@ -9,6 +9,8 @@ The entire test suite is designed to be automated with one shell script. If more
 
 To run all tests in the test suite run command: ./check.sh
 
+To clean up the quality folder run command: ./clean.sh
+
 Test Suite Description
 ----------------------
 
@@ -23,4 +25,5 @@ Test Description
 3	-	Fail gracefully and write all orders to log.
 4	-	Run to check for all sell orders. Including sanity checks for all sell orders.
 5	-	Run to check for all buy orders. Including sanity checks for all buy orders.
-6	-	Run to check for all replace orders. Including sanity checks for all replace orders.
+6	-	Run to check for all replace buy orders. Including sanity checks for all replace orders.
+7	-	Run to check for all replace sell orders. Including sanity checks for all replace orders.

@@ -20,6 +20,8 @@ int main(int argc, char *argv[]) {
 	o.broker_id = random() % 4;
 	o.matched_order_id = NOMATCH;
 	o.status = PENDING;
+	if(o.type == REPLACE_SELL)
+		o.quant = -200;
 	printf("%d %d %c %d %d %d %d %d %d\n", this->timestamp, this->id, this->ch, this->type, this->price, this->quant, this->status, this->broker_id, this->matched_order_id);
 	}
 	return 0;

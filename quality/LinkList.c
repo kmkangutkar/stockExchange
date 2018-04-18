@@ -134,11 +134,16 @@ int main(int argc, char *argv[]) {
 	int t = 0;
 	freopen(in_file, "rb", stdin);
 	scanf("%d", &t);
-	printf("t = %d\n", t);
+	//printf("t = %d\n", t);
 	while(t--) {
 		o = Order_newOrder();
 		freopen(log_file, "ab", stdout);
 		Order_print(&o);
+		if(Order_sanityCheck(&o) != 0) {
+			timestamp++;
+			printf("INVALID ORDER %d\n", Order_sanityCheck(&o));
+			continue;
+		}
 		if(o.type == BUY)
 			LinkList_addOrder(&buy, o);
 		if(o.type == SELL)
