@@ -62,23 +62,25 @@ class Client(fix.Application):
             new_message.getHeader().setField(field)
         return new_message
    
-    def new_order(self):
+    def new_order(self, message_details):
         order_message = self.start_new_message(fix.MsgType_NewOrderSingle)
+        order_id, side, qty, price = message_details
         message_fields = {
             fix.ClOrdID:self.gen_orderID(),
             fix.HandlInst:fix.HandlInst_MANUAL_ORDER_BEST_EXECUTION,
             fix.Symbol:'SMBL',
-            fix.Side:fix.Side_BUY,
+            fix.Side:side,
             fix.OrdType:fix.OrdType_LIMIT,
-            fix.OrderQty:100,
-            fix.Price:10,
+            fix.OrderQty:qty,
+            fix.Price:price,
         }
         for k, v in message_fields.items():
             order_message.setField(k(v))
         print(order_message.toString())
         fix.Session.sendToTarget(order_message, self.sessionID)
 
-    def cancel_order(self, origClOrdID):
+    def cancel_order(self, message_details):
+        origClOrdID, side, qty, price = message_details
         order_message = self.start_new_message(fix.MsgType_OrderCancelRequest)
         message_fields = {
             fix.ClOrdID:self.gen_orderID(),
@@ -92,17 +94,18 @@ class Client(fix.Application):
         print(order_message.toString())
         fix.Session.sendToTarget(order_message, self.sessionID)
     
-    def replace_order(self, origClOrdID):
+    def replace_order(self, message_details):
+        origClOrdID, side, qty, price = message_details
         order_message = self.start_new_message(fix.MsgType_OrderCancelReplaceRequest)
         message_fields = {
             fix.ClOrdID:self.gen_orderID(),
             fix.OrigClOrdID:origClOrdID,
             fix.HandlInst:fix.HandlInst_MANUAL_ORDER_BEST_EXECUTION,
             fix.Symbol:'SMBL',
-            fix.Side:fix.Side_BUY,
+            fix.Side:side,
             fix.OrdType:fix.OrdType_LIMIT,
-            fix.OrderQty:100,
-            fix.Price:5,
+            fix.OrderQty:qty,
+            fix.Price:price,
         }
         for k, v in message_fields.items():
             order_message.setField(k(v))
@@ -136,19 +139,21 @@ def main():
         client = fix.SocketInitiator(application, storeFactory, settings, logFactory)
         client.start()
         while True:
-            cmd = raw_input()
+            order = raw_input().strip().split()
+            cmd, order_id, side, qty, price = order
+            message_details = order_id, side, float(qty), float(price)
             if cmd == 'x':
                 client.stop()
                 break
             if cmd == 'n':
                 # new order
-                application.new_order()
+                application.new_order(message_details)
             if cmd == 'c':
                 # cancel order
-                application.cancel_order('1')
+                application.cancel_order(message_details)
             if cmd == 'r':
                 # replace order
-                application.replace_order('1')
+                application.replace_order(message_details)
             if cmd == 'm':
                 # market data request
                 application.market_data_request()

@@ -6,7 +6,6 @@
 #include <iterator>
 #include <iostream>
 typedef std::string string;
-#define debug
 
 struct orders {
 	orders(int t = 0, string hI = "", string coID = "", string ooID = "", string sm = "", string sd = "", string ty = "", double p = 0.00, double q = 0.00) : 
@@ -19,9 +18,8 @@ struct orders {
 			symbol.c_str(), side.c_str(), type.c_str(), price, quantity); }
 };
 
-bool new_order(orders), replace_order(orders), delete_order(orders);
+bool new_order(orders), replace_order(orders), cancel_order(orders);
 
-#ifndef debug
 #include "pybind11/pybind11.h"
 PYBIND11_MODULE(engine, trans) {
 	namespace py = pybind11;
@@ -30,9 +28,8 @@ PYBIND11_MODULE(engine, trans) {
 		.def("print", &orders::print);
 	trans.def("new_order", &new_order);
 	trans.def("replace_order", &replace_order);
-	trans.def("delete_order", &delete_order);
+	trans.def("cancel_order", &cancel_order);
 }
-#endif
 
 string fstring(string s) { return "\"" + s + "\""; }
 
@@ -71,7 +68,7 @@ bool insert_ob(orders trade, string status) {
 }
 
 bool delete_ob(orders trade) { 
-	MYSQL *connect;
+	MYSQL *connect; MYSQL_ROW row;
 	string cmd;
 	connect = open_DB();
 	cmd = command(1, "SELECT client_orderID FROM order_details where symbol = " + fstring(trade.symbol) + " and status = " + fstring("PENDING") + 
@@ -94,7 +91,6 @@ bool update_status(orders trade, string status) {
 	connect = open_DB();
 	cmd = command(1, "UPDATE order_details SET status = " + fstring(status) + " ,updatedON = " + std::to_string(time(NULL)) 
 			+ " WHERE client_orderID = " + fstring(trade.original_orderID) + " AND status = " + fstring("PENDING"));
-	printf("%s\n", cmd.c_str());
 	if(mysql_query(connect, cmd.c_str())) return false;
 	close_DB(connect);
 	return true;
@@ -118,8 +114,6 @@ orders get_matchTrade(orders trade) {
 
 bool match_trade(orders trade) {
 	orders mtrade = get_matchTrade(trade);
-	mtrade.print();
-	trade.print();
 	if(mtrade.timestamp == 0)  
 		insert_ob(trade, "PENDING");
 
@@ -142,19 +136,6 @@ bool match_trade(orders trade) {
 	return true;
 }
 
-bool new_order(orders trade) {	
-	match_trade(trade);
-	return true;
-}
-
-bool cancel_order(orders trade) {
-
-}
-
-bool replace_order(orders trade) { 
-	if(cancel_order(trade)) {
-		new_order(trade);
-		return true;
-	}
-	return false;	
-}
+bool new_order(orders trade) { return match_trade(trade); }
+bool cancel_order(orders trade) { return delete_ob(trade); }
+bool replace_order(orders trade) { return cancel_order(trade)? new_order(trade): false; }
