@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-g -O2 -Wall -ansi -Wno-unused-command-line-argument -Wpointer-arith -Wwrite-strings -Wno-overloaded-virtual -Wno-deprecated-declarations -Wno-deprecated          -std=c++0x
+CFLAGS=-g -O2 -Wall -ansi -Wno-unused-command-line-argument -Wpointer-arith -Wwrite-strings -Wno-overloaded-virtual -Wno-deprecated-declarations -Wno-deprecated          -std=c++11 -lmysqlclient
 INCLUDE_PATH=-DHAVE_CONFIG_H -I. -I.. -I../include
 
 all: compile
@@ -23,3 +23,8 @@ clean:
 
 clean_store:
 	rm ../bin/store/*
+
+clean_compile: clean compile
+
+dependencies:
+	sudo apt-get install libmysqlclient-dev

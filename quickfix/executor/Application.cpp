@@ -8,6 +8,7 @@
 #include "quickfix/Session.h"
 #include "quickfix/fix44/ExecutionReport.h"
 #include "quickfix/fix44/OrderCancelReject.h"
+#include "action_handler.h"
 
 void Application::onCreate(const FIX::SessionID& sessionID) {
   std::cout << "onCreate" << sessionID << std::endl;
@@ -42,112 +43,90 @@ throw(FIX::FieldNotFound, FIX::IncorrectDataFormat, FIX::IncorrectTagValue, FIX:
 }
 
 void Application::onMessage(const FIX44::NewOrderSingle& message, const FIX::SessionID& sessionID) {
-  std::cout << "New order: " << sessionID << message << std::endl;
+  std::cout << "New order: iyuyuyio" << sessionID << message << std::endl;
   
+  int timestamp = std::time(nullptr);
   FIX::Symbol symbol;
   FIX::Side side;
   FIX::OrdType ordType;
   FIX::OrderQty orderQty;
-  FIX::Price price;
   FIX::ClOrdID clOrdID;
-  FIX::StopPx stopPx;
+  FIX::Price price;
 
   message.get(symbol);
   message.get(side);
   message.get(ordType);
   message.get(orderQty);
   message.get(clOrdID);
-
-  if ( ordType == FIX::OrdType_STOP || ordType == FIX::OrdType_STOP_LIMIT )
-    message.get(stopPx);
-  else { 
   message.get(price);
-  }
 
   FIX::OrigClOrdID origClOrdID = (FIX::OrigClOrdID) clOrdID;
 
-  // orders order = new orders();
-  orders order;
-  order.client_orderID = clOrdID;
-  order.original_orderID = origClOrdID;
-  order.symbol = symbol;
-  order.price = price;
-  order.quantity = orderQty;
+  orders order = orders(
+    timestamp,
+    string(clOrdID),
+    string(origClOrdID),
+    string(symbol),
+    string(side + ""),
+    string(ordType + ""),
+    price,
+    orderQty
+  );
   order.sessionID = sessionID.toString();
-  order.side = side;
   order.status = "new";
-  order.type = ordType;
 
-
-  string message_type = "new";
-  int timestamp = 1200;
-  order_details details;
-  details.sessionID = sessionID;
-  details.orderID = genOrderID();
-  details.ordStatus = FIX::OrdStatus_FILLED;
-  details.symbol = symbol;
-  details.side = side;
-  details.ordType = ordType;
-  details.orderQty = orderQty;
-  details.clOrdID = clOrdID;
-  details.origClOrdID = origClOrdID;
-  details.timestamp = timestamp;
-  details.message_type = message_type;
-  if ( ordType == FIX::OrdType_STOP || ordType == FIX::OrdType_STOP_LIMIT )
-    details.stopPx = stopPx;
-  else {
-    details.price = price;
-  }
-
-  details.order_status = "executed";
+  order_details details = call_action_handler(order);
   send_execution_report(details);
+  // add sent exectuion report to log
 }
 
 void Application::onMessage(const FIX44::OrderCancelRequest& message, const FIX::SessionID& sessionID) {
   std::cout << "cancel order" << std::endl;
 
+  int timestamp = std::time(nullptr);
   FIX::Symbol symbol;
   FIX::Side side;
   FIX::OrderQty orderQty;
   FIX::ClOrdID clOrdID;
   FIX::OrigClOrdID origClOrdID;
-  double price = 0.0;
+
   message.get(symbol);
   message.get(side);
   message.get(orderQty);
   message.get(clOrdID);
   message.get(origClOrdID);
+  double price = 0.0;
 
   FIX::OrdType ordType = FIX::OrdType(-1);
-  string message_type = "cancel";
-  int timestamp = 1200;
-  order_details details;
-  details.sessionID = sessionID;
-  details.orderID = genOrderID();
-  details.symbol = symbol;
-  details.side = side;
-  details.ordType = ordType;
-  details.orderQty = orderQty;
-  details.price = price;
-  details.clOrdID = clOrdID;
-  details.origClOrdID = origClOrdID;
-  details.timestamp = timestamp;
-  details.message_type = message_type;
 
-  details.ordStatus = FIX::OrdStatus_CANCELED;
-  details.order_status = "rejected";
+  orders order = orders(
+    timestamp,
+    string(clOrdID),
+    string(origClOrdID),
+    string(symbol),
+    string(side + ""),
+    string(ordType + ""),
+    price,
+    orderQty
+  );
+  order.sessionID = sessionID.toString();
+  order.status = "cancel";
+
+  order_details details = call_action_handler(order);
   send_execution_report(details);
+  // add sent exectuion report to log  
 }
 
 void Application::onMessage(const FIX44::OrderCancelReplaceRequest& message, const FIX::SessionID& sessionID) {
   std::cout << "replace order" << std::endl;
 
+  int timestamp = std::time(nullptr);
   FIX::Symbol symbol;
   FIX::Side side;
   FIX::OrderQty orderQty;
   FIX::ClOrdID clOrdID;
-  FIX::OrdType ordType;
   FIX::OrigClOrdID origClOrdID;
+  FIX::OrdType ordType;
   FIX::Price price;
 
   message.get(symbol);
@@ -158,24 +137,22 @@ void Application::onMessage(const FIX44::OrderCancelReplaceRequest& message, con
   message.get(ordType);
   message.get(price);
 
-  string message_type = "replace";
-  int timestamp = 1200;
-  order_details details;
-  details.sessionID = sessionID;  
-  details.orderID = genOrderID();
-  details.ordStatus = FIX::OrdStatus_PENDING_REPLACE;
-  details.symbol = symbol;
-  details.side = side;
-  details.ordType = ordType;
-  details.orderQty = orderQty;
-  details.price = price;
-  details.clOrdID = clOrdID;
-  details.origClOrdID = origClOrdID;
-  details.timestamp = timestamp;
-  details.message_type = message_type;
+  orders order = orders(
+    timestamp,
+    string(clOrdID),
+    string(origClOrdID),
+    string(symbol),
+    string(side + ""),
+    string(ordType + ""),
+    price,
+    orderQty
+  );
+  order.sessionID = sessionID.toString();
+  order.status = "replace";
 
-  details.order_status = "pending";
+  order_details details = call_action_handler(order);
   send_execution_report(details);
+  // add sent exectuion report to log
 }
 
 void Application::onMessage(const FIX44::MarketDataRequest& message, const FIX::SessionID& sessionID) {
@@ -223,8 +200,8 @@ void Application::send_execution_report(order_details& details){
   FIX::OrdStatus ordStatus;
   FIX::ExecType execType;
   if (order_status == "pending") {
-    ordStatus = FIX::OrdStatus_PENDING_NEW;
-    execType = FIX::ExecType_PENDING_NEW;
+    ordStatus = FIX::OrdStatus_NEW;
+    execType = FIX::ExecType_NEW;
   } else if (order_status == "cancelled") {
     ordStatus = FIX::OrdStatus_CANCELED;
     execType = FIX::ExecType_CANCELED;
@@ -332,4 +309,44 @@ void Application::send_market_data_incremental(std::vector<dummyInc>& dummyIncLi
     catch (FIX::SessionNotFound&) {
     }
     
+}
+
+order_details Application::call_action_handler(orders& order) {
+  bool is_success = false;
+  if (order.status == "new") {
+    is_success = newOrder(order);
+  } else if (order.status == "cancel") {
+    is_success = cancelOrder(order);
+  } else if (order.status == "replace") {
+    is_success = replaceOrder(order);
+  }
+
+  order_details details = order_details(
+    genOrderID(),
+    FIX::OrdStatus(FIX::OrdStatus_REJECTED),
+    FIX::Symbol(order.symbol),
+    FIX::Side(order.side[0]),
+    FIX::OrdType(order.type[0]),
+    FIX::OrderQty(order.quantity),
+    FIX::ClOrdID(order.client_orderID),
+    FIX::OrigClOrdID(order.original_orderID),
+    order.timestamp
+  );
+  details.sessionID = FIX::SessionID("FIX.4.4", "EXECUTOR", "CLIENT1", "");
+  details.price = order.price;
+  if (order.status == "new") {
+    details.leavesQty = FIX::LeavesQty(details.orderQty);  
+  }
+
+  if (is_success) {
+    if (order.status == "new") {
+      details.order_status = "pending";
+    } else if (order.status == "cancel") {
+      details.order_status = "cancelled";
+    } else if (order.status == "replace") {
+      details.order_status = "replaced";
+    }
+  }
+  details.timestamp = std::time(nullptr);
+  return details;
 }

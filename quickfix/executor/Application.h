@@ -42,25 +42,47 @@ typedef struct order_details{
   
   string order_status = "pending";
 
+  order_details(
+    FIX::OrderID orderID,
+    FIX::OrdStatus ordStatus,
+    FIX::Symbol symbol,
+    FIX::Side side,
+    int ordType,
+    FIX::OrderQty orderQty,
+    FIX::ClOrdID clOrdID,
+    FIX::OrigClOrdID origClOrdID,
+    int timestamp
+  ) :
+    orderID(orderID),
+    ordStatus(ordStatus),
+    symbol(symbol),
+    side(side),
+    ordType(ordType),
+    orderQty(orderQty),
+    clOrdID(clOrdID),
+    origClOrdID(origClOrdID),
+    timestamp(timestamp)
+  {};
+
 }order_details;
 
-struct orders {
-	int timestamp;
-	string client_orderID, original_orderID, symbol, side, type, status;
-	double price, quantity;
+// struct orders {
+// 	int timestamp;
+// 	string client_orderID, original_orderID, symbol, side, type, status;
+// 	double price, quantity;
 
-  //extra
-  string sessionID;
+//   //extra
+//   string sessionID;
   
-	orders(int t = 0, string coID = "", string ooID = "", string sm = "", string sd = "", string ty = "", double p = 0.00, double q = 0.00) : 
-		timestamp(t), client_orderID(coID), original_orderID(ooID), symbol(sm), side(sd), type(ty), price(p), quantity(q){}
+// 	orders(int t = 0, string coID = "", string ooID = "", string sm = "", string sd = "", string ty = "", double p = 0.00, double q = 0.00) : 
+// 		timestamp(t), client_orderID(coID), original_orderID(ooID), symbol(sm), side(sd), type(ty), price(p), quantity(q){}
 
-	inline orders operator- (const orders &op) { return orders(timestamp, client_orderID, original_orderID, symbol, side, type, price, quantity - op.quantity); }
-	void print() { 
-		printf("timestamp = %d, clOrdID = %s, oOrdID = %s, symbol = %s, side = %s, type = %s price = %lf quantity = %lf\n", 
-			timestamp, client_orderID.c_str(), original_orderID.c_str(), symbol.c_str(), side.c_str(), type.c_str(), price, quantity); 
-	}
-};
+// 	inline orders operator- (const orders &op) { return orders(timestamp, client_orderID, original_orderID, symbol, side, type, price, quantity - op.quantity); }
+// 	void print() { 
+// 		printf("timestamp = %d, clOrdID = %s, oOrdID = %s, symbol = %s, side = %s, type = %s price = %lf quantity = %lf\n", 
+// 			timestamp, client_orderID.c_str(), original_orderID.c_str(), symbol.c_str(), side.c_str(), type.c_str(), price, quantity); 
+// 	}
+// };
 typedef struct dummyOrder {
   FIX::MDEntryType mdEntryType = FIX::MDEntryType('0');
   FIX::MDEntryPx mdEntryPx = FIX::MDEntryPx(12.99);
@@ -102,6 +124,7 @@ public:
   void send_execution_report(order_details&);
   void send_market_data_snapshot_full(std::vector<dummyOrder>&, const FIX::SessionID&);
   void send_market_data_incremental(std::vector<dummyInc>&, const FIX::SessionID&);
+  order_details call_action_handler(struct orders&);
 
   // MessageCracker overloads
   void onMessage( const FIX44::NewOrderSingle&, const FIX::SessionID& );
