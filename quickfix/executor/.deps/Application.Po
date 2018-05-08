@@ -330,18 +330,78 @@ Application.o: Application.cpp /usr/include/stdc-predef.h \
  ../include/quickfix/fix44/OrderCancelReplaceRequest.h \
  ../include/quickfix/fix44/MarketDataRequest.h \
  ../include/quickfix/fix44/MarketDataSnapshotFullRefresh.h \
- ../include/quickfix/fix44/MarketDataIncrementalRefresh.h \
- ../include/quickfix/Session.h \
- ../include/quickfix/fix44/ExecutionReport.h \
- ../include/quickfix/fix44/OrderCancelReject.h action_handler.h \
- /usr/include/mysql/mysql.h /usr/include/mysql/mysql_version.h \
- /usr/include/mysql/mysql_com.h /usr/include/mysql/binary_log_types.h \
- /usr/include/mysql/my_command.h /usr/include/mysql/mysql_time.h \
- /usr/include/mysql/my_list.h /usr/include/mysql/mysql/client_plugin.h \
+ ../include/quickfix/fix44/MarketDataIncrementalRefresh.h library.h \
+ /usr/include/x86_64-linux-gnu/c++/5/bits/stdc++.h \
+ /usr/include/c++/5/cassert /usr/include/assert.h \
+ /usr/include/c++/5/cfloat \
+ /usr/lib/gcc/x86_64-linux-gnu/5/include/float.h \
+ /usr/include/c++/5/ciso646 /usr/include/c++/5/climits \
+ /usr/lib/gcc/x86_64-linux-gnu/5/include-fixed/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/5/include-fixed/syslimits.h \
+ /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/local_lim.h \
+ /usr/include/linux/limits.h \
+ /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
+ /usr/include/c++/5/csetjmp /usr/include/setjmp.h \
+ /usr/include/x86_64-linux-gnu/bits/setjmp2.h /usr/include/c++/5/csignal \
+ /usr/include/c++/5/cstdarg /usr/include/c++/5/cstddef \
+ /usr/include/c++/5/ccomplex /usr/include/c++/5/complex \
+ /usr/include/c++/5/cfenv /usr/include/c++/5/fenv.h /usr/include/fenv.h \
+ /usr/include/x86_64-linux-gnu/bits/fenv.h \
+ /usr/include/x86_64-linux-gnu/bits/fenvinline.h \
+ /usr/include/c++/5/cinttypes /usr/include/inttypes.h \
+ /usr/include/c++/5/cstdalign \
+ /usr/lib/gcc/x86_64-linux-gnu/5/include/stdalign.h \
+ /usr/include/c++/5/cstdbool \
+ /usr/lib/gcc/x86_64-linux-gnu/5/include/stdbool.h \
+ /usr/include/c++/5/ctgmath /usr/include/c++/5/bitset \
+ /usr/include/c++/5/fstream \
+ /usr/include/x86_64-linux-gnu/c++/5/bits/basic_file.h \
+ /usr/include/x86_64-linux-gnu/c++/5/bits/c++io.h \
+ /usr/include/c++/5/bits/fstream.tcc /usr/include/c++/5/list \
+ /usr/include/c++/5/bits/stl_list.h /usr/include/c++/5/bits/list.tcc \
+ /usr/include/c++/5/stack /usr/include/c++/5/bits/stl_stack.h \
+ /usr/include/c++/5/valarray /usr/include/c++/5/bits/valarray_array.h \
+ /usr/include/c++/5/bits/valarray_array.tcc \
+ /usr/include/c++/5/bits/valarray_before.h \
+ /usr/include/c++/5/bits/slice_array.h \
+ /usr/include/c++/5/bits/valarray_after.h \
+ /usr/include/c++/5/bits/gslice.h /usr/include/c++/5/bits/gslice_array.h \
+ /usr/include/c++/5/bits/mask_array.h \
+ /usr/include/c++/5/bits/indirect_array.h /usr/include/c++/5/atomic \
+ /usr/include/c++/5/chrono /usr/include/c++/5/ratio \
+ /usr/include/c++/5/bits/parse_numbers.h \
+ /usr/include/c++/5/condition_variable /usr/include/c++/5/mutex \
+ /usr/include/c++/5/forward_list /usr/include/c++/5/bits/forward_list.h \
+ /usr/include/c++/5/bits/forward_list.tcc /usr/include/c++/5/future \
+ /usr/include/c++/5/thread /usr/include/c++/5/bits/atomic_futex.h \
+ /usr/include/c++/5/regex /usr/include/c++/5/bits/regex_constants.h \
+ /usr/include/c++/5/bits/regex_error.h \
+ /usr/include/c++/5/bits/regex_automaton.h \
+ /usr/include/c++/5/bits/regex_automaton.tcc \
+ /usr/include/c++/5/bits/regex_scanner.h \
+ /usr/include/c++/5/bits/regex_scanner.tcc \
+ /usr/include/c++/5/bits/regex_compiler.h \
+ /usr/include/c++/5/bits/regex_compiler.tcc \
+ /usr/include/c++/5/bits/regex.h /usr/include/c++/5/bits/regex.tcc \
+ /usr/include/c++/5/bits/regex_executor.h \
+ /usr/include/c++/5/bits/regex_executor.tcc \
+ /usr/include/c++/5/scoped_allocator /usr/include/c++/5/typeindex \
+ /usr/include/c++/5/unordered_map /usr/include/c++/5/bits/hashtable.h \
+ /usr/include/c++/5/bits/hashtable_policy.h \
+ /usr/include/c++/5/bits/unordered_map.h /usr/include/c++/5/unordered_set \
+ /usr/include/c++/5/bits/unordered_set.h /usr/include/mysql/mysql.h \
+ /usr/include/mysql/mysql_version.h /usr/include/mysql/mysql_com.h \
+ /usr/include/mysql/binary_log_types.h /usr/include/mysql/my_command.h \
+ /usr/include/mysql/mysql_time.h /usr/include/mysql/my_list.h \
+ /usr/include/mysql/mysql/client_plugin.h \
  /usr/include/mysql/mysql/plugin_auth_common.h \
  /usr/include/mysql/typelib.h /usr/include/mysql/my_alloc.h \
  /usr/include/mysql/mysql/psi/psi_memory.h \
- /usr/include/mysql/mysql/psi/psi_base.h
+ /usr/include/mysql/mysql/psi/psi_base.h ../include/quickfix/Session.h \
+ ../include/quickfix/fix44/ExecutionReport.h \
+ ../include/quickfix/fix44/OrderCancelReject.h
 
 /usr/include/stdc-predef.h:
 
@@ -1189,13 +1249,183 @@ Application.h:
 
 ../include/quickfix/fix44/MarketDataIncrementalRefresh.h:
 
-../include/quickfix/Session.h:
+library.h:
 
-../include/quickfix/fix44/ExecutionReport.h:
+/usr/include/x86_64-linux-gnu/c++/5/bits/stdc++.h:
 
-../include/quickfix/fix44/OrderCancelReject.h:
+/usr/include/c++/5/cassert:
 
-action_handler.h:
+/usr/include/assert.h:
+
+/usr/include/c++/5/cfloat:
+
+/usr/lib/gcc/x86_64-linux-gnu/5/include/float.h:
+
+/usr/include/c++/5/ciso646:
+
+/usr/include/c++/5/climits:
+
+/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed/limits.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
+
+/usr/include/c++/5/csetjmp:
+
+/usr/include/setjmp.h:
+
+/usr/include/x86_64-linux-gnu/bits/setjmp2.h:
+
+/usr/include/c++/5/csignal:
+
+/usr/include/c++/5/cstdarg:
+
+/usr/include/c++/5/cstddef:
+
+/usr/include/c++/5/ccomplex:
+
+/usr/include/c++/5/complex:
+
+/usr/include/c++/5/cfenv:
+
+/usr/include/c++/5/fenv.h:
+
+/usr/include/fenv.h:
+
+/usr/include/x86_64-linux-gnu/bits/fenv.h:
+
+/usr/include/x86_64-linux-gnu/bits/fenvinline.h:
+
+/usr/include/c++/5/cinttypes:
+
+/usr/include/inttypes.h:
+
+/usr/include/c++/5/cstdalign:
+
+/usr/lib/gcc/x86_64-linux-gnu/5/include/stdalign.h:
+
+/usr/include/c++/5/cstdbool:
+
+/usr/lib/gcc/x86_64-linux-gnu/5/include/stdbool.h:
+
+/usr/include/c++/5/ctgmath:
+
+/usr/include/c++/5/bitset:
+
+/usr/include/c++/5/fstream:
+
+/usr/include/x86_64-linux-gnu/c++/5/bits/basic_file.h:
+
+/usr/include/x86_64-linux-gnu/c++/5/bits/c++io.h:
+
+/usr/include/c++/5/bits/fstream.tcc:
+
+/usr/include/c++/5/list:
+
+/usr/include/c++/5/bits/stl_list.h:
+
+/usr/include/c++/5/bits/list.tcc:
+
+/usr/include/c++/5/stack:
+
+/usr/include/c++/5/bits/stl_stack.h:
+
+/usr/include/c++/5/valarray:
+
+/usr/include/c++/5/bits/valarray_array.h:
+
+/usr/include/c++/5/bits/valarray_array.tcc:
+
+/usr/include/c++/5/bits/valarray_before.h:
+
+/usr/include/c++/5/bits/slice_array.h:
+
+/usr/include/c++/5/bits/valarray_after.h:
+
+/usr/include/c++/5/bits/gslice.h:
+
+/usr/include/c++/5/bits/gslice_array.h:
+
+/usr/include/c++/5/bits/mask_array.h:
+
+/usr/include/c++/5/bits/indirect_array.h:
+
+/usr/include/c++/5/atomic:
+
+/usr/include/c++/5/chrono:
+
+/usr/include/c++/5/ratio:
+
+/usr/include/c++/5/bits/parse_numbers.h:
+
+/usr/include/c++/5/condition_variable:
+
+/usr/include/c++/5/mutex:
+
+/usr/include/c++/5/forward_list:
+
+/usr/include/c++/5/bits/forward_list.h:
+
+/usr/include/c++/5/bits/forward_list.tcc:
+
+/usr/include/c++/5/future:
+
+/usr/include/c++/5/thread:
+
+/usr/include/c++/5/bits/atomic_futex.h:
+
+/usr/include/c++/5/regex:
+
+/usr/include/c++/5/bits/regex_constants.h:
+
+/usr/include/c++/5/bits/regex_error.h:
+
+/usr/include/c++/5/bits/regex_automaton.h:
+
+/usr/include/c++/5/bits/regex_automaton.tcc:
+
+/usr/include/c++/5/bits/regex_scanner.h:
+
+/usr/include/c++/5/bits/regex_scanner.tcc:
+
+/usr/include/c++/5/bits/regex_compiler.h:
+
+/usr/include/c++/5/bits/regex_compiler.tcc:
+
+/usr/include/c++/5/bits/regex.h:
+
+/usr/include/c++/5/bits/regex.tcc:
+
+/usr/include/c++/5/bits/regex_executor.h:
+
+/usr/include/c++/5/bits/regex_executor.tcc:
+
+/usr/include/c++/5/scoped_allocator:
+
+/usr/include/c++/5/typeindex:
+
+/usr/include/c++/5/unordered_map:
+
+/usr/include/c++/5/bits/hashtable.h:
+
+/usr/include/c++/5/bits/hashtable_policy.h:
+
+/usr/include/c++/5/bits/unordered_map.h:
+
+/usr/include/c++/5/unordered_set:
+
+/usr/include/c++/5/bits/unordered_set.h:
 
 /usr/include/mysql/mysql.h:
 
@@ -1222,3 +1452,9 @@ action_handler.h:
 /usr/include/mysql/mysql/psi/psi_memory.h:
 
 /usr/include/mysql/mysql/psi/psi_base.h:
+
+../include/quickfix/Session.h:
+
+../include/quickfix/fix44/ExecutionReport.h:
+
+../include/quickfix/fix44/OrderCancelReject.h:

@@ -8,7 +8,7 @@
 #include "quickfix/Session.h"
 #include "quickfix/fix44/ExecutionReport.h"
 #include "quickfix/fix44/OrderCancelReject.h"
-#include "action_handler.h"
+// #include "action_handler.h"
 
 void Application::onCreate(const FIX::SessionID& sessionID) {
   std::cout << "onCreate" << sessionID << std::endl;
@@ -43,7 +43,7 @@ throw(FIX::FieldNotFound, FIX::IncorrectDataFormat, FIX::IncorrectTagValue, FIX:
 }
 
 void Application::onMessage(const FIX44::NewOrderSingle& message, const FIX::SessionID& sessionID) {
-  std::cout << "New order: iyuyuyio" << sessionID << message << std::endl;
+  std::cout << "New order:" << sessionID << message << std::endl;
   
   int timestamp = std::time(nullptr);
   FIX::Symbol symbol;
@@ -74,10 +74,12 @@ void Application::onMessage(const FIX44::NewOrderSingle& message, const FIX::Ses
   );
   order.sessionID = sessionID.toString();
   order.status = "new";
+  order.side = side.getValue();
+  order.type = ordType.getValue();
 
   order_details details = call_action_handler(order);
   send_execution_report(details);
-  // add sent exectuion report to log
+  // // add sent exectuion report to log
 }
 
 void Application::onMessage(const FIX44::OrderCancelRequest& message, const FIX::SessionID& sessionID) {
@@ -111,7 +113,8 @@ void Application::onMessage(const FIX44::OrderCancelRequest& message, const FIX:
   );
   order.sessionID = sessionID.toString();
   order.status = "cancel";
-
+  order.side = side.getValue();
+  order.type = ordType.getValue();
   order_details details = call_action_handler(order);
   send_execution_report(details);
   // add sent exectuion report to log  
@@ -149,7 +152,8 @@ void Application::onMessage(const FIX44::OrderCancelReplaceRequest& message, con
   );
   order.sessionID = sessionID.toString();
   order.status = "replace";
-
+  order.side = side.getValue();
+  order.type = ordType.getValue();
   order_details details = call_action_handler(order);
   send_execution_report(details);
   // add sent exectuion report to log
@@ -197,6 +201,7 @@ void Application::onMessage(const FIX44::MarketDataRequest& message, const FIX::
 void Application::send_execution_report(order_details& details){
   string order_status = details.order_status;
   // pending, cancelled, rejected, partial, executed
+  std::cout << order_status << details.order_status << std::endl;
   FIX::OrdStatus ordStatus;
   FIX::ExecType execType;
   if (order_status == "pending") {
@@ -214,7 +219,10 @@ void Application::send_execution_report(order_details& details){
   } else if (order_status == "executed") {
     ordStatus = FIX::OrdStatus_FILLED;
     execType = FIX::ExecType_TRADE;
-  }
+  } else if (order_status == "replaced") {
+    ordStatus = FIX::OrdStatus_PENDING_REPLACE;
+    execType = FIX::ExecType_REPLACE;
+  } 
 
   FIX44::ExecutionReport executionReport = FIX44::ExecutionReport(
     FIX::OrderID(details.orderID),
@@ -237,8 +245,9 @@ void Application::send_execution_report(order_details& details){
     executionReport.set(FIX::OrdType(details.ordType));
   }
   else if (execType == FIX::ExecType_TRADE) {
-    executionReport.set(FIX::LastPx(details.lastPx));
-    executionReport.set(FIX::LastQty(details.lastQty));
+    executionReport.set(FIX::LastPx(details.price));
+    executionReport.set(FIX::LastQty(details.orderQty));
+    executionReport.set(FIX::OrigClOrdID(details.origClOrdID));
   }
   else if ((execType == FIX::ExecType_REPLACE) || (execType == FIX::ExecType_CANCELED)) {
     executionReport.set(FIX::OrigClOrdID(details.origClOrdID));
@@ -313,14 +322,47 @@ void Application::send_market_data_incremental(std::vector<dummyInc>& dummyIncLi
 
 order_details Application::call_action_handler(orders& order) {
   bool is_success = false;
-  if (order.status == "new") {
-    is_success = newOrder(order);
+  struct orders x_order;
+    if (order.status == "new") {
+      std::cout << "calling newOrder" << std::endl;      
+      x_order = newOrder(order);
   } else if (order.status == "cancel") {
     is_success = cancelOrder(order);
+    std::cout << "calling cancelOrder" << std::endl;      
   } else if (order.status == "replace") {
     is_success = replaceOrder(order);
   }
 
+  if (order.status == "new") {
+    order_details details = order_details(
+      x_order.client_orderID,
+      FIX::OrdStatus(FIX::OrdStatus_REJECTED),
+      FIX::Symbol(x_order.symbol),
+      FIX::Side(x_order.side[0]),
+      FIX::OrdType(x_order.type[0]),
+      FIX::OrderQty(x_order.quantity),
+      FIX::ClOrdID(x_order.client_orderID),
+      FIX::OrigClOrdID(x_order.original_orderID),
+      x_order.timestamp
+    );
+    details.sessionID = FIX::SessionID("FIX.4.4", "EXECUTOR", "CLIENT1", "");
+    details.price = x_order.price;
+    details.leavesQty = FIX::LeavesQty(details.orderQty);
+
+    std::cout << "status" << x_order.status << std::endl;
+    if(x_order.status == "PENDING"){
+      details.order_status = "pending";
+    } else if (x_order.status == "PARTIAL"){
+      std::cout << "par" << x_order.status << details.order_status << std::endl;    
+      details.order_status = "partial";
+    } else if (x_order.status == "EXECUTED"){
+      details.order_status = "executed";
+      std::cout << "exe" << x_order.status << details.order_status << std::endl;    
+    }
+    details.timestamp = std::time(nullptr);
+    return details;
+  }
+  
   order_details details = order_details(
     genOrderID(),
     FIX::OrdStatus(FIX::OrdStatus_REJECTED),
@@ -334,10 +376,7 @@ order_details Application::call_action_handler(orders& order) {
   );
   details.sessionID = FIX::SessionID("FIX.4.4", "EXECUTOR", "CLIENT1", "");
   details.price = order.price;
-  if (order.status == "new") {
-    details.leavesQty = FIX::LeavesQty(details.orderQty);  
-  }
-
+  std::cout << order.status << std::endl;      
   if (is_success) {
     if (order.status == "new") {
       details.order_status = "pending";
@@ -346,7 +385,10 @@ order_details Application::call_action_handler(orders& order) {
     } else if (order.status == "replace") {
       details.order_status = "replaced";
     }
-  }
+  }else {
+      details.order_status = "rejected";
+    }
+  std::cout << "ef" <<details.order_status << std::endl;      
   details.timestamp = std::time(nullptr);
   return details;
 }

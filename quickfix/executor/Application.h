@@ -14,6 +14,8 @@
 #include "quickfix/fix44/MarketDataSnapshotFullRefresh.h"
 #include "quickfix/fix44/MarketDataIncrementalRefresh.h"
 
+#include "library.h"
+
 typedef std::string string;
 
 typedef struct order_details{
